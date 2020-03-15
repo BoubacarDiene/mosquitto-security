@@ -73,7 +73,7 @@ MKDIR := mkdir -p
 #
 define make-examples
     @- $(foreach example,$1, \
-        $(MKDIR) $(EXAMPLES_OUT_DIR)/$(example) ; \
+        @$(MKDIR) $(EXAMPLES_OUT_DIR)/$(example) ; \
         $(CC) $(CFLAGS) $(EXAMPLES_SRC_DIR)/$(example)/subscriber.c \
                         -o $(EXAMPLES_OUT_DIR)/$(example)/subscriber \
               $(LDFLAGS) ; \
