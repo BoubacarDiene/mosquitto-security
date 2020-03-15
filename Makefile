@@ -16,8 +16,9 @@ LOCAL := $(shell pwd)
 #################################################################
 
 # Paths
-EXAMPLES_ROOT_DIRECTORY := $(LOCAL)/examples
-EXAMPLES_OUT_DIRECTORY  := $(LOCAL)/out
+EXAMPLES_SRC_DIR := $(LOCAL)/src
+EXAMPLES_OUT_DIR := $(LOCAL)/out
+EXAMPLES_LIST    := $(patsubst $(EXAMPLES_SRC_DIR)/%/.,%,$(wildcard $(EXAMPLES_SRC_DIR)/*/.))
 
 # Build options
 #   - BUILD_TYPE = "',' separated between 'gdb', 'asan' and 'secu'" (Not set => release build)
@@ -51,7 +52,7 @@ endif
 CC      := gcc
 LDFLAGS := $(LDFLAGS_OPTIONS)
 CFLAGS  := $(CFLAGS_OPTIONS) \
-           -I$(EXAMPLES_ROOT_DIRECTORY)
+           -I$(EXAMPLES_SRC_DIR)
 
 # Shell commands
 CP    := cp -rf
@@ -62,7 +63,7 @@ MKDIR := mkdir -p
 #                             Build                             #
 #################################################################
 
-.PHONY: all
+.PHONY: all clean
 .DEFAULT_GOAL := all
 .NOTPARALLEL:
 
@@ -72,23 +73,21 @@ MKDIR := mkdir -p
 #
 define make-examples
     @- $(foreach example,$1, \
-        $(MKDIR) $(EXAMPLES_OUT_DIRECTORY)/$(example) ; \
-        $(CC) $(CFLAGS) $(EXAMPLES_ROOT_DIRECTORY)/$(example)/subscriber.c \
-                        -o $(EXAMPLES_OUT_DIRECTORY)/$(example)/subscriber \
+        $(MKDIR) $(EXAMPLES_OUT_DIR)/$(example) ; \
+        $(CC) $(CFLAGS) $(EXAMPLES_SRC_DIR)/$(example)/subscriber.c \
+                        -o $(EXAMPLES_OUT_DIR)/$(example)/subscriber \
               $(LDFLAGS) ; \
-        $(CC) $(CFLAGS) $(EXAMPLES_ROOT_DIRECTORY)/$(example)/publisher.c \
-                        -o $(EXAMPLES_OUT_DIRECTORY)/$(example)/publisher \
+        $(CC) $(CFLAGS) $(EXAMPLES_SRC_DIR)/$(example)/publisher.c \
+                        -o $(EXAMPLES_OUT_DIR)/$(example)/publisher \
               $(LDFLAGS) ; \
-        $(CP) $(EXAMPLES_ROOT_DIRECTORY)/$(example)/mosquitto.conf \
-              $(EXAMPLES_OUT_DIRECTORY)/$(example)/
+        $(CP) $(EXAMPLES_SRC_DIR)/$(example)/mosquitto.conf \
+              $(EXAMPLES_OUT_DIR)/$(example)/
     )
 endef
 
 # Build all examples
-# make or make all
-all: EXAMPLES := 1-client-id-prefix
 all:
-	$(call make-examples,$(EXAMPLES))
+	$(call make-examples,$(EXAMPLES_LIST))
 
 # Build a single example
 # E.g.: make 1-client-id-prefix
@@ -97,4 +96,4 @@ all:
 
 # Clean examples' output directory
 clean:
-	$(RM) $(EXAMPLES_OUT_DIRECTORY) ||:
+	$(RM) $(EXAMPLES_OUT_DIR) ||:

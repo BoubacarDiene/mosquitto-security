@@ -25,24 +25,26 @@ The plan is to test these security mechanisms in following configurations:
 ### Generate docker image
 
 ```
-$ docker build -t mosquitto-image ci/
+docker build -t mosquitto-image ci/
 ```
 
-### Build (The second make command will compile one example)
+### Build (The second make command will compile the specified example)
 ```
-$ docker run --privileged -it -u $(id -u) --rm -v $(pwd):/workdir mosquitto-image:latest
+docker run --privileged -it -u $(id -u) --rm -v $(pwd):/workdir mosquitto-image:latest
 
-mosquitto-usr@<container_id>:/workdir$ make
-mosquitto-usr@<container_id>:/workdir$ make <example_directory_name>
+make
+make <example_directory_name>
 ```
 
 ### Run
 
 | Which bash terminal? | Commands |
 | --- | --- |
-| #1 | ```$ docker run --privileged -it -u $(id -u) --rm -v $(pwd):/workdir mosquitto-image:latest```<br><br>```mosquitto-usr@<container_id>:/workdir$ mosquitto -v -c out/<example_directory_name>/mosquitto.conf``` |
-| #2 | ```$ docker exec -it <container_id> /bin/bash```<br><br>```mosquitto-usr@<container_id>:/workdir$ ./out/<example_directory_name>/subscriber <args>``` |
-| #3 | ```$ docker exec -it <container_id> /bin/bash```<br><br>```mosquitto-usr@<container_id>:/workdir$ ./out/<example_directory_name>/publisher <args>``` |
+| #1 | ```docker run --privileged -it -u $(id -u) --rm -v $(pwd):/workdir mosquitto-image:latest```<br>```mosquitto -v -c out/<example_directory_name>/mosquitto.conf``` |
+| #2 | ```docker exec -it <container_id> /bin/bash```<br>```./out/<example_directory_name>/subscriber <args>``` |
+| #3 | ```docker exec -it <container_id> /bin/bash```<br>```./out/<example_directory_name>/publisher <args>``` |
+
+**NB:** ```docker ps``` to find out the container_id
 
 ## Notes
 
@@ -59,10 +61,11 @@ Why a semaphore?
   variable of type "volatile sig_atomic_t" then unblock the main program.
 
 - Errno is always saved and restored by the signal handler to make sure it will not cause
-  trouble to an internal functions. For example, the following scenario can occur:
-  + An internal function call sets errno value
-  + The function call gets interrupted by the signal handle
-  + Back to the internal function which checks errno value
+  an unexpected behaviour.
+  For example, the following scenario can occur:
+  + A function call sets errno value
+  + That function call gets interrupted by the signal handler
+  + Back to the function call which checks errno value
 
 ### Error checking
 
