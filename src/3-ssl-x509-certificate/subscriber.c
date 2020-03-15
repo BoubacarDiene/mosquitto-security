@@ -23,7 +23,7 @@
 
 /*!
  * \file subsriber.c
- * \brief Subscriber code to test "username-password" security mechanism
+ * \brief Subscriber code to test "ssl-x509-certificate" security mechanism
  * \author Boubacar DIENE
  */
 
@@ -50,9 +50,14 @@
 #define TAG "subscriber"
 
 #define BROKER_HOSTNAME "localhost"
-#define BROKER_PORT     1883
+#define BROKER_PORT     8883
 
-#define TOPIC "/topic/username/password/prefix"
+#define TOPIC "/topic/ssl/x509-certificate/prefix"
+
+#define CERTS_DIRECTORY "/workdir/out/certificates"
+#define CAFILE          CERTS_DIRECTORY"/ca/ca.crt"
+#define CERTFILE        CERTS_DIRECTORY"/clients/subscriber/client.crt"
+#define KEYFILE         CERTS_DIRECTORY"/clients/subscriber/client.key"
 
 /* -------------------------------------------------------------------------------------------- */
 /* //////////////////////////////////////// VARIABLES ///////////////////////////////////////// */
@@ -78,7 +83,7 @@ static void onLog(struct mosquitto *mosq, void *obj, int level, const char *str)
 /* /////////////////////////////////////////// MAIN /////////////////////////////////////////// */
 /* -------------------------------------------------------------------------------------------- */
 
-int main(int argc, char **argv)
+int main(void)
 {
     Logd("Initialize semaphore and signal handler");
     sem_init(&stopSem, 0, 0);
@@ -96,13 +101,11 @@ int main(int argc, char **argv)
     Logd("Initialize client");
     struct mosquitto *mosq = mosquitto_new("secure-subscriber-id", true, NULL);
 
-    /**
-     * The password can also be provided in command line to test the behaviour
-     * when a wrong value is provided
-     */
-    const char *password = (argc == 2 ? argv[1] : "secure-subscriber-password");
-    Logd("Authenticate client using password: %s", password);
-    mosquitto_username_pw_set(mosq, "secure-subscriber-username", password);
+    Logd("Set client's username");
+    mosquitto_username_pw_set(mosq, "secure-subscriber-username", NULL);
+
+    Logd("Configure the client for certificate based SSL/TLS support");
+    mosquitto_tls_set(mosq, CAFILE, NULL, CERTFILE, KEYFILE, NULL);
 
     Logd("Register callbacks to get notified about subscription, message and logs");
     mosquitto_subscribe_callback_set(mosq, &onSubscribe);

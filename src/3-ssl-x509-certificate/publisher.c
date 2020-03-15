@@ -22,8 +22,8 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*!
- * \file subsriber.c
- * \brief Subscriber code to test "username-password" security mechanism
+ * \file publisher.c
+ * \brief Publisher code to test "ssl-x509-certificate" security mechanism
  * \author Boubacar DIENE
  */
 
@@ -47,12 +47,17 @@
 /* -------------------------------------------------------------------------------------------- */
 
 #undef  TAG
-#define TAG "subscriber"
+#define TAG "publisher"
 
 #define BROKER_HOSTNAME "localhost"
-#define BROKER_PORT     1883
+#define BROKER_PORT     8883
 
-#define TOPIC "/topic/username/password/prefix"
+#define TOPIC "/topic/ssl/x509-certificate/prefix"
+
+#define CERTS_DIRECTORY "/workdir/out/certificates"
+#define CAFILE          CERTS_DIRECTORY"/ca/ca.crt"
+#define CERTFILE        CERTS_DIRECTORY"/clients/publisher/client.crt"
+#define KEYFILE         CERTS_DIRECTORY"/clients/publisher/client.key"
 
 /* -------------------------------------------------------------------------------------------- */
 /* //////////////////////////////////////// VARIABLES ///////////////////////////////////////// */
@@ -66,19 +71,15 @@ static sem_t stopSem;
 
 static void signalHandler(int signalNumber);
 
-static void onSubscribe(struct mosquitto *mosq,
-                        void *obj,
-                        int mid,
-                        int qos_count,
-                        const int *granted_qos);
-static void onMessage(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message);
+static void onPublish(struct mosquitto *mosq, void *obj, int mid);
+static void onConnect(struct mosquitto *mosq, void *obj, int rc);
 static void onLog(struct mosquitto *mosq, void *obj, int level, const char *str);
 
 /* -------------------------------------------------------------------------------------------- */
 /* /////////////////////////////////////////// MAIN /////////////////////////////////////////// */
 /* -------------------------------------------------------------------------------------------- */
 
-int main(int argc, char **argv)
+int main(void)
 {
     Logd("Initialize semaphore and signal handler");
     sem_init(&stopSem, 0, 0);
@@ -94,26 +95,25 @@ int main(int argc, char **argv)
     mosquitto_lib_init();
 
     Logd("Initialize client");
-    struct mosquitto *mosq = mosquitto_new("secure-subscriber-id", true, NULL);
+    struct mosquitto *mosq = mosquitto_new("secure-publisher-id", true, NULL);
 
-    /**
-     * The password can also be provided in command line to test the behaviour
-     * when a wrong value is provided
-     */
-    const char *password = (argc == 2 ? argv[1] : "secure-subscriber-password");
-    Logd("Authenticate client using password: %s", password);
-    mosquitto_username_pw_set(mosq, "secure-subscriber-username", password);
+    Logd("Set client's username");
+    mosquitto_username_pw_set(mosq, "secure-publisher-username", NULL);
+
+    Logd("Configure the client for certificate based SSL/TLS support");
+    mosquitto_tls_set(mosq, CAFILE, NULL, CERTFILE, KEYFILE, NULL);
 
     Logd("Register callbacks to get notified about subscription, message and logs");
-    mosquitto_subscribe_callback_set(mosq, &onSubscribe);
-    mosquitto_message_callback_set(mosq, &onMessage);
+    mosquitto_publish_callback_set(mosq, &onPublish);
+    mosquitto_connect_callback_set(mosq, &onConnect);
     mosquitto_log_callback_set(mosq, &onLog);
 
     Logd("Connect client to the broker");
     mosquitto_connect(mosq, BROKER_HOSTNAME, BROKER_PORT, 10);
 
-    Logd("Subscribe to topic: %s", TOPIC);
-    mosquitto_subscribe(mosq, NULL, TOPIC, 0);
+    char payload[] = "Testing \"ssl-x509-certificate\" security mechanism";
+    Logd("Publish message to topic: %s", TOPIC);
+    mosquitto_publish(mosq, NULL, TOPIC, sizeof(payload), payload, 0, false);
 
     /**
      * Loop: wait in a different thread until sem_post() is called by the signal
@@ -126,7 +126,6 @@ int main(int argc, char **argv)
     mosquitto_loop_stop(mosq, /*true => Do not wait for mosquitto_disconnect()*/true);
 
     Logd("Release resources");
-    mosquitto_unsubscribe(mosq, NULL, TOPIC);
     mosquitto_disconnect(mosq);
     mosquitto_destroy(mosq);
 
@@ -160,27 +159,20 @@ static void signalHandler(int signalNumber)
 /* //////////////////////////////////////// CALLBACKS ///////////////////////////////////////// */
 /* -------------------------------------------------------------------------------------------- */
 
-static void onSubscribe(struct mosquitto *mosq,
-                        void *obj,
-                        int mid,
-                        int qos_count,
-                        const int *granted_qos)
+static void onPublish(struct mosquitto *mosq, void *obj, int mid)
 {
     (void)mosq;
     (void)obj;
-    (void)granted_qos;
 
-    Logi("\n\tmid=%d\n\tqos_count=%d", mid, qos_count);
+    Logi("\n\tmid=%d", mid);
 }
 
-static void onMessage(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message)
+static void onConnect(struct mosquitto *mosq, void *obj, int rc)
 {
     (void)mosq;
     (void)obj;
 
-    Logi("\n\tmid=%d\n\ttopic=%s\n\tpayload=%s\n\tpayloadlen=%u\n\tqos=%d\n\tretain=%d",
-          message->mid, message->topic, (char*)message->payload, message->payloadlen,
-          message->qos, message->retain);
+    Logi("\n\trc=%d", rc);
 }
 
 static void onLog(struct mosquitto *mosq, void *obj, int level, const char *str)

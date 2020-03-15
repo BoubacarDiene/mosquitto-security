@@ -24,9 +24,9 @@ EXAMPLES_LIST    := $(patsubst $(EXAMPLES_SRC_DIR)/%/.,%,$(wildcard $(EXAMPLES_S
 #   - BUILD_TYPE = "',' separated between 'gdb', 'asan' and 'secu'" (Not set => release build)
 #
 #   Examples:
-#   - make all install
-#   - make all install BUILD_TYPE=gdb
-#   - make all install BUILD_TYPE=gdb,asan,secu
+#   - make all
+#   - make all BUILD_TYPE=gdb
+#   - make all BUILD_TYPE=gdb,asan,secu
 BUILD_TYPE ?= release
 
 # https://linux.die.net/man/1/gcc
@@ -88,12 +88,8 @@ endef
 # Build all examples
 all:
 	$(call make-examples,$(EXAMPLES_LIST))
+	@./scripts/generate-certificates.sh $(EXAMPLES_OUT_DIR)
 
-# Build a single example
-# E.g.: make 1-client-id-prefix
-%:
-	$(call make-examples,$@)
-
-# Clean examples' output directory
+# Clean output directory
 clean:
 	$(RM) $(EXAMPLES_OUT_DIR) ||:
