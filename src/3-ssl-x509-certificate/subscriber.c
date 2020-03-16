@@ -52,7 +52,7 @@
 #define BROKER_HOSTNAME "localhost"
 #define BROKER_PORT     8883
 
-#define TOPIC "/topic/ssl/x509-certificate/prefix"
+#define TOPIC "/topic/ssl/x509-certificate"
 
 #define CERTS_DIRECTORY "/workdir/out/certificates"
 #define CAFILE          CERTS_DIRECTORY"/ca/ca.crt"

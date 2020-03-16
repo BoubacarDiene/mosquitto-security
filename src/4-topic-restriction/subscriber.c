@@ -23,7 +23,7 @@
 
 /*!
  * \file subsriber.c
- * \brief Subscriber code to test "username-password" security mechanism
+ * \brief Subscriber code to test "topic-restriction" security mechanism
  * \author Boubacar DIENE
  */
 
@@ -50,9 +50,14 @@
 #define TAG "subscriber"
 
 #define BROKER_HOSTNAME "localhost"
-#define BROKER_PORT     1883
+#define BROKER_PORT     8883
 
-#define TOPIC "/topic/username/password"
+#define TOPIC "/topic/restriction"
+
+#define CERTS_DIRECTORY "/workdir/out/certificates"
+#define CAFILE          CERTS_DIRECTORY"/ca/ca.crt"
+#define CERTFILE        CERTS_DIRECTORY"/clients/subscriber/client.crt"
+#define KEYFILE         CERTS_DIRECTORY"/clients/subscriber/client.key"
 
 /* -------------------------------------------------------------------------------------------- */
 /* //////////////////////////////////////// VARIABLES ///////////////////////////////////////// */
@@ -96,13 +101,11 @@ int main(int argc, char **argv)
     Logd("Initialize client");
     struct mosquitto *mosq = mosquitto_new("secure-subscriber-id", true, NULL);
 
-    /**
-     * The password can also be provided in command line to test the behaviour
-     * when a wrong value is provided
-     */
-    const char *password = (argc == 2 ? argv[1] : "secure-subscriber-password");
-    Logd("Authenticate client using password: %s", password);
-    mosquitto_username_pw_set(mosq, "secure-subscriber-username", password);
+    Logd("Set client's username");
+    mosquitto_username_pw_set(mosq, "secure-subscriber-username", NULL);
+
+    Logd("Configure the client for certificate based SSL/TLS support");
+    mosquitto_tls_set(mosq, CAFILE, NULL, CERTFILE, KEYFILE, NULL);
 
     Logd("Register callbacks to get notified about subscription, message and logs");
     mosquitto_subscribe_callback_set(mosq, &onSubscribe);
@@ -112,8 +115,13 @@ int main(int argc, char **argv)
     Logd("Connect client to the broker");
     mosquitto_connect(mosq, BROKER_HOSTNAME, BROKER_PORT, 10);
 
-    Logd("Subscribe to topic: %s", TOPIC);
-    mosquitto_subscribe(mosq, NULL, TOPIC, 0);
+    /**
+     * The topic can also be set in command line to test the behaviour
+     * when a value not allowed in the ACL is used
+     */
+    const char *topic = (argc == 2 ? argv[1] : TOPIC);
+    Logd("Subscribe to topic: %s", topic);
+    mosquitto_subscribe(mosq, NULL, topic, 0);
 
     /**
      * Loop: wait in a different thread until sem_post() is called by the signal

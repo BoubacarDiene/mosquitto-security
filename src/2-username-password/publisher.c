@@ -52,7 +52,7 @@
 #define BROKER_HOSTNAME "localhost"
 #define BROKER_PORT     1883
 
-#define TOPIC "/topic/username/password/prefix"
+#define TOPIC "/topic/username/password"
 
 /* -------------------------------------------------------------------------------------------- */
 /* //////////////////////////////////////// VARIABLES ///////////////////////////////////////// */

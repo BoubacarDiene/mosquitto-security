@@ -52,8 +52,11 @@ Why a semaphore?
 - mosquitto_loop_forever() is stopped when mosquitto_disconnect() is called.
   mosquitto_disconnect() seems not reentrant (internal use of malloc()/free() and
   printf-family functions, ...) so it is not safe to call it inside a handler
-- Another possible solution is to make the signal handler only update an atomic variable
-  of type "volatile sig_atomic_t" then unblock the main program.
+
+Other solutions exist. For example:
+- Make the signal handler only update an atomic variable of type "volatile sig_atomic_t"
+  then unblock the main program
+- Use [signalfd](http://man7.org/linux/man-pages/man2/signalfd.2.html) as an alternative to the use of a signal handler
 
 Also note that
 - Errno is always saved and restored by the signal handler to make sure it will not cause

@@ -1,8 +1,18 @@
 #!/bin/bash
-
+##
+#
+# \file generate-certificates.sh
+#
+# \author Boubacar DIENE <boubacar.diene@gmail.com>
+# \date   2020
+#
+# \brief  Script to generate all certificates necessary to authenticate clients
+#         and encrypt their communication with the broker
+#
+# Usage:
 # ./scripts/generate-certificates.sh <path_to_directory_where_to_create_certificates_folder>
-# or (for current directory)
-# ./scripts/generate-certificates.sh
+#
+##
 DEST_PATH=${1:-`pwd`}
 CERTS_PATH=$DEST_PATH/certificates
 
