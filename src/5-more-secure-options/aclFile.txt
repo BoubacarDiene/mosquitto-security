@@ -1,7 +1,7 @@
 # This only affects clients with the following username (Publisher's
 # certificate subject
-# Any messages published to a topic other than "/topic/restriction"
-# or "/test" will be rejected by the broker with "Denied PUBLISH from..."
+# Any messages published to a topic other than "/topic/more/secure/options"
+# will be rejected by the broker with "Denied PUBLISH from..."
 
 user CN=localhost,OU=PI,O=Publisher Inc.,L=Nairobi,ST=Kenya,C=KE
 topic write /mountPoint/topic/more/secure/options
@@ -9,7 +9,7 @@ topic write /mountPoint/topic/more/secure/options
 # This only affects clients with the following username (Subscriber's
 # certificate subject
 # Subscription will work but a message posted to a topic other than
-# "/topic/restriction" will not be forwarded by the broker
+# "/topic/more/secure/options" will not be forwarded by the broker
 
 user CN=localhost,OU=SI,O=Subscriber Inc.,L=Paris,ST=France,C=FR
 topic read /mountPoint/topic/more/secure/options

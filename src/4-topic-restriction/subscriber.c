@@ -134,7 +134,7 @@ int main(int argc, char **argv)
     mosquitto_loop_stop(mosq, /*true => Do not wait for mosquitto_disconnect()*/true);
 
     Logd("Release resources");
-    mosquitto_unsubscribe(mosq, NULL, TOPIC);
+    mosquitto_unsubscribe(mosq, NULL, topic);
     mosquitto_disconnect(mosq);
     mosquitto_destroy(mosq);
 
