@@ -54,7 +54,7 @@
 
 #define TOPIC "/topic/ssl/x509-certificate"
 
-#define CERTS_DIRECTORY "/workdir/out/certificates"
+#define CERTS_DIRECTORY BUILD_ETC_DIR"/certificates"
 #define CAFILE          CERTS_DIRECTORY"/ca/ca.crt"
 #define CERTFILE        CERTS_DIRECTORY"/clients/subscriber/client.crt"
 #define KEYFILE         CERTS_DIRECTORY"/clients/subscriber/client.key"

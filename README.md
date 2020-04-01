@@ -5,7 +5,8 @@
 One purpose of this project is to show how to use [mosquitto](https://mosquitto.org/).
 
 With the provided Dockerfile and sample codes, one can easily set up a working
-environment to start testing mosquitto and quickly prototyping solutions.
+environment to start testing mosquitto and quickly prototyping solutions (Test the C
+API instead of using mosquitto_sub/_pub tools, ...).
 
 However, the main purpose is to experiment security mechanisms which can allow
 to authenticate clients and/or secure communication between clients and the broker.
@@ -28,16 +29,17 @@ docker build -t mosquitto-image ci/
 ```
 docker run --privileged -it -u $(id -u) --rm -v $(pwd):/workdir mosquitto-image:latest
 
-make
+mkdir build && cd build
+cmake .. -DCMAKE_INSTALL_PREFIX=./out && make && make install
 ```
 
 ### Run
 
 | Which bash terminal? | Commands |
 | --- | --- |
-| #1 | ```docker run --privileged -it -u $(id -u) --rm -v $(pwd):/workdir mosquitto-image:latest```<br><br>```mosquitto -v -c out/<example_directory_name>/mosquitto.conf``` |
-| #2 | ```docker exec -it <container_id> /bin/bash```<br><br>```./out/<example_directory_name>/subscriber <args>``` |
-| #3 | ```docker exec -it <container_id> /bin/bash```<br><br>```./out/<example_directory_name>/publisher <args>``` |
+| #1 | ```docker run --privileged -it -u $(id -u) --rm -v $(pwd):/workdir mosquitto-image:latest```<br><br>```mosquitto -v -c out/etc/<example_directory_name>/mosquitto.conf``` |
+| #2 | ```docker exec -it <container_id> /bin/bash```<br><br>```./out/etc/<example_directory_name>/subscriber <args>``` |
+| #3 | ```docker exec -it <container_id> /bin/bash```<br><br>```./out/etc/<example_directory_name>/publisher <args>``` |
 
 **NB:** ```docker ps``` to find out the container_id
 
