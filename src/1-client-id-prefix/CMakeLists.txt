@@ -31,10 +31,14 @@ foreach(source ${sources})
     executable_from_source(${source}
                            ${currentDirectoryName}
                            "${executableName}")
-
-    # Install files to the etc directory and give read permission
-    # to owner and group
-    install(FILES mosquitto.conf
-            DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/${currentDirectoryName}
-            PERMISSIONS OWNER_READ GROUP_READ)
 endforeach()
+
+# Replace cmake variables in mosquitto.conf and save output
+# file to ${CMAKE_CURRENT_BINARY_DIR}/mosquitto.conf
+configure_file(mosquitto.conf.in mosquitto.conf)
+
+# Install files to the etc directory and give read permission
+# to owner and group
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/mosquitto.conf
+        DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/${currentDirectoryName}
+        PERMISSIONS OWNER_READ GROUP_READ)

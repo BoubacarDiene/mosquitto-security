@@ -26,4 +26,4 @@ keyfile ${BUILD_ETC_DIR}/certificates/broker/broker.key
 require_certificate true
 
 # Path to access control list file whose content is used to control client access to topics on the broker
-acl_file /workdir/src/4-topic-restriction/aclFile.txt
+acl_file ${BUILD_ETC_DIR}/4-topic-restriction/aclFile.txt
