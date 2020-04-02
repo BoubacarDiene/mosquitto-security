@@ -1,11 +1,11 @@
 ##
 #
-# \file (example 3) CMakeLists.txt
+# \file (example 6) CMakeLists.txt
 #
 # \author Boubacar DIENE <boubacar.diene@gmail.com>
 # \date   March 2020
 #
-# \brief  CMakeLists.txt to build and install example 3
+# \brief  CMakeLists.txt to build and install example 6
 #
 ##
 
@@ -36,9 +36,11 @@ endforeach()
 # Replace cmake variables in mosquitto.conf and save output
 # file to ${CMAKE_CURRENT_BINARY_DIR}/mosquitto.conf
 configure_file(mosquitto.conf.in mosquitto.conf)
+configure_file(mosquitto-bridge.conf.in mosquitto-bridge.conf)
 
 # Install files to the etc directory and give read permission
 # to owner and group
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/mosquitto.conf
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/mosquitto.conf aclFile.txt
+              ${CMAKE_CURRENT_BINARY_DIR}/mosquitto-bridge.conf aclFile-bridge.txt
         DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/${currentDirectoryName}
         PERMISSIONS OWNER_READ GROUP_READ)

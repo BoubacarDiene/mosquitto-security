@@ -1,6 +1,6 @@
 ##
 #
-# \file (example 1) CMakeLists.txt
+# \file (example 2) CMakeLists.txt
 #
 # \author Boubacar DIENE <boubacar.diene@gmail.com>
 # \date   March 2020

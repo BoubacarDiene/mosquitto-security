@@ -1,0 +1,167 @@
+###################################################################
+#                          GENERAL OPTIONS
+###################################################################
+
+# Control client access to topics on the broker
+acl_file ${BUILD_ETC_DIR}/6-broker-and-bridge/aclFile-bridge.txt
+
+# Determine whether clients that connect without providing a username
+# are allowed to connect
+allow_anonymous false
+
+# Minimise memory usage: It's up to clients to make sure that topics
+# do not overlap
+allow_duplicate_messages true
+
+# Do not allow clients to connect with a zero length client id
+allow_zero_length_clientid false
+
+# Only allow clients that have a clientid with a prefix that matches
+# clientid_prefixes will be allowed to connect to the broker
+clientid_prefixes secure-
+
+# Do not include entries when clients connect and disconnect in logs
+connection_messages false
+
+# Disable logging
+# Note: It's possible to send log messages to a particular destination.
+#       Possible destinations are: stdout stderr syslog topic
+#log_dest none
+
+# Guarantee in-order delivery of outgoing QoS 1 or 2 messages
+max_inflight_messages 1
+
+# Disconnect clients sending a packet size in bytes greater than following value
+max_packet_size 100
+
+# Maximum number of QoS 1 or 2 messages to hold in the queue (per client)
+max_queued_messages 5
+
+# Maximum publish payload size in bytes that the broker will allow
+message_size_limit 70
+
+# Apply settings to all listeners
+per_listener_settings false
+
+# Do not write connection, subscription and message data to the disk
+# in mosquitto.db
+persistence false
+
+###################################################################
+#                           LISTENERS
+###################################################################
+
+# Listen for incoming network connection on the specified port
+# binding to the specified address
+# Note: If this variable is used and neither the global bind_address
+#       nor port options are used then the default listener will not
+#       be started
+listener 8884 127.0.0.1
+
+# Limit the total number of clients connected for the current listener
+max_connections 2
+
+# Structuring topics in a tree helps to separate data channels and provide
+# a logical order of information. However, this can lead to very long topic
+# names being used during the publication of messages, hence increasing the
+# size of each message.
+# Topic aliases allow to circumvent this. Instead of the topic string, an
+# integer value is sent
+max_topic_alias 0
+
+# This option is used with the listener option to isolate groups of clients.
+# When a client connects to a listener which uses this option, the string
+# argument is attached to the start of all topics for this client. This
+# prefix is removed when any messages are sent to the client.
+#
+# Example:
+# - The subscriber subscribes to topic "/mytopic"
+#   => The broker appends /bridgeMountPoint to the topic then
+#      + never notifies the subscriber if /bridgeMountPoint/mytopic is not allowed in aclFile.txt
+#      + will notify the suscriber if /bridgeMountPoint/mytopic is allowed in aclFile.txt
+# - The publisher publishes to topic "/mytopic"
+#   => The broker appends /mountPoint to the topic then
+#      + "rejects" the publication if /bridgeMountPoint/mytopic is not allowed in aclFile.txt
+#      + accepts the publication if /bridgeMountPoint/mytopic is allowed in aclFile.txt
+#mount_point /bridgeMountPoint
+
+# By default, a listener will attempt to listen on all supported IP protocol
+# versions. Set to ipv4 to force the listener to only use IPv4
+socket_domain ipv4
+
+###################################################################
+#                 CERTIFICATE BASED SSL/TLS SUPPORT
+###################################################################
+
+# Path to file containing trusted certificates
+cafile ${BUILD_ETC_DIR}/certificates/ca/ca.crt
+
+# Path to the PEM encoded server certificate
+certfile ${BUILD_ETC_DIR}/certificates/bridge/bridge.crt
+
+# Path to the PEM encoded keyfile
+keyfile ${BUILD_ETC_DIR}/certificates/bridge/bridge.key
+
+# Require certificate when authenticating a client
+require_certificate true
+
+# true => CN (Domain name) in client's certificate is used as client's username
+# Note: I prefer "use_subject_as_username" which is longer so maybe less
+#       easy to guess
+#use_identity_as_username true
+
+# true => The subject in client's certificate is used as client's username
+# The subject is in a form similar to "CN=Test client,OU=Production,O=Server,L=Thies,ST=Senegal,C=SN"
+use_subject_as_username true
+
+###################################################################
+#                              BRIDGE
+###################################################################
+
+# Set bridge's name also used as a client id on the remote broker
+connection bridge-name
+
+# Specify the address and port to connect to
+address localhost:8883
+
+# Prevent mosquitto from attempting to unsubscribe from remote topics
+# when they are configured for the out direction
+bridge_attempt_unsubscribe false
+
+# Clean up all subscriptions and messages on the remote broker if the
+# network connection drops
+cleansession true
+
+# If set to true, publish notification messages to the local and remote
+# brokers giving information about the state of the bridge connection
+notifications false
+
+# Client id for this bridge connection
+remote_clientid secure-bridge-remote-client-id
+
+# Username for this bridge
+remote_username secure-bridge-remote-username
+
+# Topic patterns to be shared between the two brokers
+# Syntax: topic pattern [[[ out | in | both ] qos-level] local-prefix remote-prefix]
+topic /topic/broker/and/bridge in 0 "" ""
+topic /topic/broker/and/bridge out 0 "" ""
+
+# If try_private is set to true, the bridge will attempt to indicate to
+# the remote broker that it is a bridge not an ordinary client
+try_private true
+
+# Path to file containing trusted certificates
+bridge_cafile ${BUILD_ETC_DIR}/certificates/ca/ca.crt
+
+# Path to the PEM encoded server certificate
+bridge_certfile ${BUILD_ETC_DIR}/certificates/bridge/bridge.crt
+
+# Path to the PEM encoded keyfile
+bridge_keyfile ${BUILD_ETC_DIR}/certificates/bridge/bridge.key
+
+# When using certificate based TLS, the bridge will attempt to verify
+# the hostname provided in the remote certificate matches the host/address
+# being connected to. This may cause problems in testing scenarios, so
+# bridge_insecure may be set to false to disable the hostname verification
+bridge_insecure false

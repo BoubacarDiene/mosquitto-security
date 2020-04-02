@@ -1,0 +1,21 @@
+# This only affects clients with the following username (Subscriber's
+# certificate subject)
+# Subscription will work but a message posted to a topic other than
+# "/topic/broker/and/bridge" will not be forwarded by the broker
+
+user CN=localhost,OU=SI,O=Subscriber Inc.,L=Paris,ST=France,C=FR
+topic read /brokerMountPoint/topic/broker/and/bridge
+
+# This only affects clients with the following username (Publisher's
+# certificate subject)
+# Any messages published to a topic other than
+# "/topic/broker/and/bridge" will be rejected by
+# the broker with "Denied PUBLISH from..."
+
+user CN=localhost,OU=PI,O=Publisher Inc.,L=Nairobi,ST=Kenya,C=KE
+topic write /brokerMountPoint/topic/broker/and/bridge
+
+# Bridge <-> broker
+# Bridge is allowed to publish and subscribe to "/topic/broker/and/bridge"
+user CN=localhost,OU=BR,O=Bridge Inc.,L=Bamako,ST=Mali,C=ML
+topic readwrite /brokerMountPoint/topic/broker/and/bridge

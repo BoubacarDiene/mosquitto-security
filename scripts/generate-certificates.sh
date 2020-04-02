@@ -67,4 +67,16 @@ openssl x509 -req -in client.csr \
         -out client.crt -days $NB_DAYS \
         -passin pass:$PEM_PASSPHRASE
 
+#
+# Bridge
+#
+mkdir -p $CERTS_PATH/bridge && cd $CERTS_PATH/bridge
+openssl genrsa -out bridge.key 2048
+openssl req -out bridge.csr -key bridge.key -new \
+        -subj "/C=ML/ST=Mali/L=Bamako/O=Bridge Inc./OU=BR/CN=$COMMON_NAME"
+openssl x509 -req -in bridge.csr \
+        -CA $CERTS_PATH/ca/ca.crt -CAkey $CERTS_PATH/ca/ca.key -CAcreateserial \
+        -out bridge.crt -days $NB_DAYS \
+        -passin pass:$PEM_PASSPHRASE
+
 exit 0
