@@ -33,13 +33,13 @@ mkdir build && cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=./out && make && make install
 ```
 
-### Run
+### Run (inside docker image)
 
 | Which bash terminal? | Commands |
 | --- | --- |
-| #1 | ```docker run --privileged -it -u $(id -u) --rm -v $(pwd):/workdir mosquitto-image:latest```<br><br>```mosquitto -v -c out/etc/<example_directory_name>/mosquitto.conf``` |
-| #2 | ```docker exec -it <container_id> /bin/bash```<br><br>```./out/etc/<example_directory_name>/subscriber <args>``` |
-| #3 | ```docker exec -it <container_id> /bin/bash```<br><br>```./out/etc/<example_directory_name>/publisher <args>``` |
+| #1 | ```mosquitto -v -c out/etc/<example_directory_name>/mosquitto.conf``` |
+| #2 | ```out/etc/<example_directory_name>/subscriber <args>``` |
+| #3 | ```out/etc/<example_directory_name>/publisher <args>``` |
 
 **NB:** ```docker ps``` to find out the container_id
 

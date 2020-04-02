@@ -34,7 +34,6 @@
 #include <errno.h>
 #include <semaphore.h>
 #include <signal.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
