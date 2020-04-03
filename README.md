@@ -26,6 +26,7 @@ docker build -t mosquitto-image ci/
 ```
 
 ### Build
+
 ```
 docker run --privileged -it -u $(id -u) --rm -v $(pwd):/workdir mosquitto-image:latest
 
