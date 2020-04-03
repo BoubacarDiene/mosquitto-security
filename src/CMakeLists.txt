@@ -98,7 +98,7 @@ macro(list_subdirectories result currentDir)
 endmacro()
 
 # Generate executable from sourceFile and install it to outdir
-macro(executable_from_source sourceFile currentDirectoryName executableName)
+macro(executable_from_source sourceFile destinationDirName executableName)
     # Generate a random number
     # This project generates several executables with the same name (publisher
     # or subscriber). add_executable() fails if used twice with the same name.
@@ -115,7 +115,7 @@ macro(executable_from_source sourceFile currentDirectoryName executableName)
 
     # Install exectuable to bin directory
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${executableName}-${randomNumber}
-            DESTINATION ${CMAKE_INSTALL_BINDIR}/${currentDirectoryName}
+            DESTINATION ${CMAKE_INSTALL_BINDIR}/${destinationDirName}
             RENAME ${executableName})
 endmacro()
 
