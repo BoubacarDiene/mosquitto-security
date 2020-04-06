@@ -42,7 +42,6 @@ cmake .. -DCMAKE_INSTALL_PREFIX=./out && make && make install
 | #2 | ```out/etc/<example_directory_name>/subscriber <args>``` |
 | #3 | ```out/etc/<example_directory_name>/publisher <args>``` |
 
-**NB:** ```docker ps``` to find out the container_id
 
 ## Notes
 
